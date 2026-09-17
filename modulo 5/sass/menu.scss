@@ -1,0 +1,22 @@
+@use "abstracts/variables";
+
+@use "base/reset";
+@use "base/base";
+
+@use "components/botones";
+@use "components/acordeon";
+@use "components/lista";
+@use "components/formulario";
+
+@use "layout/header";
+@use "layout/main";
+@use "layout/cuerpo";
+@use "layout/resumen";
+@use "layout/footer";
+@use "layout/responsive";
+
+@use "pages/inicio";
+
+@use "themes/tema";
+
+@use "vendors/bootstrap";

@@ -1,0 +1,59 @@
+.formulario {
+    display: none;
+}
+
+.formulario--visible {
+    display: flex;
+    justify-content: center;
+    padding: 30px 8%;
+}
+
+.formulario__contenido {
+    width: 100%;
+    max-width: 500px;
+    padding: 25px;
+    background-color: #6ef132;
+    border-radius: 8px;
+}
+
+.formulario__titulo {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.formulario__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.formulario__input {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+}
+
+.formulario__acciones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.formulario__boton {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.formulario__boton--guardar {
+    background-color: #30c573;
+    color: #ffffff;
+}
+
+.formulario__boton--cancelar {
+    background-color: #ffffff;
+    color: #333;
+}

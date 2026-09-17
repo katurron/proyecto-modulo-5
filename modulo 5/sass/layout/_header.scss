@@ -1,0 +1,45 @@
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 8%;
+    background-color: #30c573;
+}
+
+.header__logo {
+    width: 100px;
+    height: auto;
+}
+
+.header__titulo {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.header__boton {
+    padding: 8px 16px;
+    background-color: #6ef132;
+    color: #500202;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+@media (max-width: 768px) {
+
+    .header {
+        padding: 15px 5%;
+    }
+
+    .header__logo {
+        width: 75px;
+    }
+
+    .header__titulo {
+        font-size: 20px;
+    }
+
+    .header__boton {
+        padding: 6px 12px;
+    }
+}

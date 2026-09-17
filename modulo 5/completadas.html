@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Tareas completadas</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        crossorigin="anonymous">
+
+    <link
+        rel="stylesheet"
+        href="styles.css">
+
+</head>
+
+<body>
+
+    <!-- ==============================
+         HEADER
+    =============================== -->
+
+    <header class="header">
+
+        <img
+            class="header__logo"
+            src="./proyecto modulo 5/img/logotipo.png"
+            alt="Logotipo">
+
+        <h1 class="header__titulo">
+            Tareas completadas
+        </h1>
+
+        <button
+            type="button"
+            class="header__boton"
+            id="btnVolver">
+
+            ←
+
+        </button>
+
+    </header>
+
+
+    <!-- ==============================
+         HISTORIAL
+    =============================== -->
+
+    <main class="historial">
+
+        <div class="historial__encabezado">
+
+            <h2 class="historial__titulo">
+                Historial de tareas
+            </h2>
+
+        </div>
+
+
+        <!-- ==============================
+             FILTROS
+        =============================== -->
+
+        <div class="historial__filtros">
+
+            <label for="filtroCategoria">
+                Filtrar por categoría
+            </label>
+
+            <select
+                id="filtroCategoria"
+                class="historial__select">
+
+                <option value="todas">
+                    Todas
+                </option>
+
+                <option value="importantes">
+                    Importantes
+                </option>
+
+                <option value="regulares">
+                    Regulares
+                </option>
+
+                <option value="complementarias">
+                    Complementarias
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ==============================
+             TABLA
+        =============================== -->
+
+        <div class="historial__tabla">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Tarea
+                        </th>
+
+                        <th>
+                            Fecha
+                        </th>
+
+                        <th>
+                            Creación
+                        </th>
+
+                        <th>
+                            Finalización
+                        </th>
+
+                        <th>
+                            Categoría
+                        </th>
+
+                        <th>
+                            Dificultad
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="tablaHistorial">
+
+                    <!-- JavaScript agregará las tareas -->
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+
+    <!-- ==============================
+         ESTADÍSTICAS
+    =============================== -->
+
+    <section class="estadisticas">
+
+        <h2 class="estadisticas__titulo">
+            Estadísticas
+        </h2>
+
+
+        <div class="estadisticas__botones">
+
+            <button
+                type="button"
+                class="estadisticas__boton"
+                id="btnGraficoTotal">
+
+                Tareas completadas vs total
+
+            </button>
+
+
+            <button
+                type="button"
+                class="estadisticas__boton"
+                id="btnGraficoTiempo">
+
+                Tiempo promedio por categoría
+
+            </button>
+
+
+            <button
+                type="button"
+                class="estadisticas__boton"
+                id="btnGraficoDificultad">
+
+                Dificultad promedio por categoría
+
+            </button>
+
+        </div>
+
+
+        <!-- Aquí aparecerán posteriormente los gráficos -->
+
+        <div
+            class="estadisticas__grafico"
+            id="contenedorGrafico">
+
+        </div>
+
+    </section>
+
+
+    <!-- ==============================
+         FOOTER
+    =============================== -->
+
+    <footer class="footer--fondo">
+
+        <div class="footer__contacto">
+
+            <h2 class="footer__titulo">
+                Contacto
+            </h2>
+
+            <p class="footer__texto">
+                Correo electrónico: Fescaratelara@gmail.com
+            </p>
+
+            <p class="footer__texto">
+                Teléfono: +56957395406
+            </p>
+
+        </div>
+
+        <p class="footer__derechos">
+            FESCLA derechos reservados 2026
+        </p>
+
+    </footer>
+
+
+    <script src="completadas.js"></script>
+
+</body>
+
+</html>

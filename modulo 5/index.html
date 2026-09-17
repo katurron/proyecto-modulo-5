@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Aplicación de tareas</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous">
+
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <img
+            class="header__logo"
+            src="./proyecto modulo 5/img/logotipo.png"
+            alt="Logotipo">
+
+        <h1 class="header__titulo">
+            Mis tareas
+        </h1>
+
+        <button
+            class="header__boton"
+            id="btnAgregar"
+            type="button">
+            +
+        </button>
+        
+
+    </header>
+    <!-- FORMULARIO PARA NUEVA TAREA -->
+<section class="formulario" id="formulario">
+
+    <form class="formulario__contenido">
+
+        <h2 class="formulario__titulo">
+            Nueva tarea
+        </h2>
+
+        <div class="formulario__campo">
+            <label for="nombreTarea">
+                Nombre de la tarea
+            </label>
+
+            <input
+                type="text"
+                id="nombreTarea"
+                class="formulario__input"
+                required
+                placeholder="Escribe una tarea">
+        </div>
+
+        <div class="formulario__campo">
+            <label for="categoriaTarea">
+                Categoría
+            </label>
+
+            <select
+                id="categoriaTarea"
+                class="formulario__input"
+                required
+                >
+
+                <option value="">
+                    Selecciona una categoría
+                </option>
+
+                <option value="importantes">
+                    Importantes
+                </option>
+
+                <option value="regulares">
+                    Regulares
+                </option>
+
+                <option value="complementarias">
+                    Complementarias
+                </option>
+
+            </select>
+        </div>
+
+        <div class="formulario__campo">
+            <label for="fechaTarea">
+                Fecha
+            </label>
+
+            <input
+                type="date"
+                id="fechaTarea"
+                required
+                class="formulario__input">
+        </div>
+
+        <div class="formulario__acciones">
+
+            <button
+                type="submit"
+                class="formulario__boton formulario__boton--guardar">
+                Guardar
+            </button>
+
+            <button
+                type="button"
+                id="btnCancelar"
+                class="formulario__boton formulario__boton--cancelar">
+                Cancelar
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+    <!-- RESUMEN GENERAL -->
+    <main class="main">
+
+    <ul class="main__lista">
+
+        <li class="main__item">
+            <button
+                type="button"
+                class="main__boton"
+                id="btnPendientes">
+                Tareas pendientes
+            </button>
+        </li>
+
+        <li class="main__item">
+            <button
+                type="button"
+                class="main__boton"
+                id="btnCompletadas">
+                Tareas completadas
+            </button>
+        </li>
+
+        <li class="main__item">
+
+    <button
+        type="button"
+        class="main__boton"
+        id="btnHoy"
+        data-bs-toggle="modal"
+        data-bs-target="#modalHoy">
+
+        Tareas programadas hoy
+
+    </button>
+
+</li>
+
+    </ul>
+
+</main>
+
+
+    <!-- CUERPO PRINCIPAL -->
+    <section class="cuerpo" id="cuerpo">
+
+        <div
+    class="accordion accordion-flush cuerpo__acordeon"
+    id="accordionFlushExample">
+
+    <!-- TAREAS IMPORTANTES -->
+    <div class="accordion-item cuerpo__item">
+
+        <h2
+            class="accordion-header cuerpo__encabezado"
+            id="flush-headingOne">
+
+            <button
+                class="accordion-button collapsed cuerpo__boton"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#flush-collapseOne"
+                aria-expanded="false"
+                aria-controls="flush-collapseOne">
+
+                Importantes
+
+            </button>
+
+        </h2>
+
+        <div
+            id="flush-collapseOne"
+            class="accordion-collapse collapse cuerpo__contenido"
+            aria-labelledby="flush-headingOne">
+
+            <div class="accordion-body cuerpo__tareas">
+
+                <!-- Aquí aparecerán las tareas importantes -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TAREAS REGULARES -->
+    <div class="accordion-item cuerpo__item">
+
+        <h2
+            class="accordion-header cuerpo__encabezado"
+            id="flush-headingTwo">
+
+            <button
+                class="accordion-button collapsed cuerpo__boton"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#flush-collapseTwo"
+                aria-expanded="false"
+                aria-controls="flush-collapseTwo">
+
+                Regulares
+
+            </button>
+
+        </h2>
+
+        <div
+            id="flush-collapseTwo"
+            class="accordion-collapse collapse cuerpo__contenido"
+            aria-labelledby="flush-headingTwo">
+
+            <div class="accordion-body cuerpo__tareas">
+
+                <!-- Aquí aparecerán las tareas regulares -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TAREAS COMPLEMENTARIAS -->
+    <div class="accordion-item cuerpo__item">
+
+        <h2
+            class="accordion-header cuerpo__encabezado"
+            id="flush-headingThree">
+
+            <button
+                class="accordion-button collapsed cuerpo__boton"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#flush-collapseThree"
+                aria-expanded="false"
+                aria-controls="flush-collapseThree">
+
+                Complementarias
+
+            </button>
+
+        </h2>
+
+        <div
+            id="flush-collapseThree"
+            class="accordion-collapse collapse cuerpo__contenido"
+            aria-labelledby="flush-headingThree">
+
+            <div class="accordion-body cuerpo__tareas">
+
+                <!-- Aquí aparecerán las tareas complementarias -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+    </section>
+
+
+    <!-- RESUMEN DE HOY -->
+    <section class="resumen" id="resumen">
+
+    <div class="resumen__encabezado">
+
+        <h2 class="resumen__titulo">
+            Resumen de hoy
+        </h2>
+
+    </div>
+
+        <div id="lista">
+            <ul class="list-group resumen__lista">
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Completadas hoy
+    <span class="badge bg-primary rounded-pill">14</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Pendientes hoy
+    <span class="badge bg-primary rounded-pill">2</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Principales próximas
+    <span class="badge bg-primary rounded-pill">1</span>
+  </li>
+</ul>
+</div>
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="footer--fondo">
+
+        <div class="footer__contacto">
+
+            <h2 class="footer__titulo">
+                Contacto
+            </h2>
+
+            <p class="footer__texto">
+                Correo electrónico: Fescaratelara@gmail.com
+            </p>
+
+            <p class="footer__texto">
+                Teléfono: +56957395406
+            </p>
+
+        </div>
+
+        <p class="footer__derechos">
+            FESCLA derechos reservados 2026
+        </p>
+
+    </footer>
+<!-- VENTANA TAREAS PROGRAMADAS HOY -->
+
+<div
+    class="modal fade"
+    id="modalHoy"
+    tabindex="-1"
+    aria-labelledby="modalHoyTitulo"
+    aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2
+                    class="modal-title"
+                    id="modalHoyTitulo">
+                    Tareas programadas hoy
+                </h2>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="modalHoyContenido">
+
+                <!-- Aquí JavaScript mostrará las tareas -->
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+   <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

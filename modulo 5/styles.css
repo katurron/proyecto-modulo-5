@@ -1,0 +1,454 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #30c573;
+  color: #333;
+  min-height: 100vh;
+}
+
+.cuerpo__boton {
+  display: flex;
+  padding: 12px 20px;
+  background-color: #6ef132;
+  color: #500202;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resumen__lista .list-group-item {
+  background-color: #6ef132;
+  color: #500202;
+  border-color: #30c573;
+}
+
+.resumen__lista .badge {
+  background-color: #30c573 !important;
+  color: #ffffff;
+}
+
+.formulario {
+  display: none;
+}
+
+.formulario--visible {
+  display: flex;
+  justify-content: center;
+  padding: 30px 8%;
+}
+
+.formulario__contenido {
+  width: 100%;
+  max-width: 500px;
+  padding: 25px;
+  background-color: #6ef132;
+  border-radius: 8px;
+}
+
+.formulario__titulo {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.formulario__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.formulario__input {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+}
+
+.formulario__acciones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.formulario__boton {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.formulario__boton--guardar {
+  background-color: #30c573;
+  color: #ffffff;
+}
+
+.formulario__boton--cancelar {
+  background-color: #ffffff;
+  color: #333;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 8%;
+  background-color: #30c573;
+}
+
+.header__logo {
+  width: 100px;
+  height: auto;
+}
+
+.header__titulo {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.header__boton {
+  padding: 8px 16px;
+  background-color: #6ef132;
+  color: #500202;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 5%;
+  }
+  .header__logo {
+    width: 75px;
+  }
+  .header__titulo {
+    font-size: 20px;
+  }
+  .header__boton {
+    padding: 6px 12px;
+  }
+}
+.main {
+  background-color: #30c573;
+  color: #333;
+  opacity: 0.9;
+  padding: 20px 8%;
+}
+.main__lista {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.main__item {
+  padding: 15px 25px;
+}
+.main__boton {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #333;
+  cursor: pointer;
+}
+.main__boton:hover {
+  text-decoration: underline;
+}
+
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #30c573;
+  padding: 20px 8%;
+  width: 100%;
+}
+
+.cuerpo__acordeon {
+  width: 100%;
+}
+
+.cuerpo__item {
+  background-color: transparent;
+  border: none;
+}
+
+.cuerpo__contenido {
+  background-color: #ffffff;
+}
+
+.cuerpo__tareas {
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .cuerpo {
+    padding: 15px 5%;
+  }
+  .cuerpo__boton {
+    padding: 12px 15px;
+  }
+  .cuerpo__tareas {
+    padding: 15px;
+  }
+}
+.cuerpo__tarea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  margin-bottom: 5px;
+  background-color: #ffffff;
+}
+
+.resumen {
+  background-color: #45c985;
+  color: #333;
+  padding: 30px 8%;
+}
+
+.resumen__encabezado {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.resumen__titulo {
+  font-size: 24px;
+  color: #ffffff;
+  margin: 0;
+}
+
+.resumen__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+@media (max-width: 768px) {
+  .resumen {
+    padding: 25px 5%;
+  }
+  .resumen__titulo {
+    font-size: 22px;
+  }
+  .resumen__lista {
+    width: 100%;
+    max-width: none;
+  }
+}
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 40px 8%;
+  background-color: #30c573;
+  color: #333;
+}
+
+.footer__contacto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer__titulo {
+  margin: 0 0 10px;
+}
+
+.footer__texto {
+  margin: 0;
+}
+
+.footer__derechos {
+  align-self: end;
+  justify-self: end;
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 30px 5%;
+    align-items: center;
+  }
+  .footer__derechos {
+    justify-self: start;
+    align-self: auto;
+    font-size: 13px;
+  }
+}
+/* ==============================
+   RESPONSIVE - TABLET
+   ============================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* ==============================
+     HEADER
+     ============================== */
+  .header {
+    padding: 20px 5%;
+  }
+  .header__logo {
+    width: 90px;
+  }
+  .header__titulo {
+    font-size: 26px;
+  }
+  .header__boton {
+    padding: 10px 16px;
+  }
+  /* ==============================
+     MAIN
+     ============================== */
+  .main {
+    padding: 20px 5%;
+  }
+  .main__lista {
+    justify-content: space-between;
+  }
+  .main__item {
+    padding: 15px 10px;
+  }
+  /* ==============================
+     CUERPO
+     ============================== */
+  .cuerpo {
+    padding: 20px 5%;
+  }
+  .cuerpo__boton {
+    padding: 14px 20px;
+  }
+  /* ==============================
+     RESUMEN
+     ============================== */
+  .resumen {
+    padding: 35px 5%;
+  }
+  .resumen__lista {
+    max-width: 700px;
+  }
+  .resumen__titulo {
+    font-size: 26px;
+  }
+  /* ==============================
+     FOOTER
+     ============================== */
+  .footer {
+    padding: 40px 5%;
+  }
+  .footer__derechos {
+    font-size: 14px;
+  }
+}
+
+/*# sourceMappingURL=styles.css.map */
+
+/* ==========================================
+   TABLA HISTORIAL - ESTILO TIPO EXCEL
+========================================== */
+
+.historial {
+    width: 90%;
+    margin: 40px auto;
+}
+
+.historial__encabezado {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.historial__titulo {
+    color: white;
+}
+
+
+/* FILTRO */
+
+.historial__filtros {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.historial__select {
+    padding: 8px 15px;
+}
+
+
+/* CONTENEDOR DE TABLA */
+
+.historial__tabla {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* TABLA */
+
+.historial__tabla table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    background-color: #66f329;
+}
+
+
+/* ENCABEZADOS Y CELDAS */
+
+.historial__tabla th,
+.historial__tabla td {
+
+    border: 2px solid white;
+
+    padding: 12px;
+
+    text-align: center;
+
+    vertical-align: middle;
+}
+
+
+/* ENCABEZADOS */
+
+.historial__tabla th {
+
+    background-color: #66f329;
+
+    font-weight: bold;
+
+}
+
+
+/* FILAS */
+
+.historial__tabla tr {
+
+    background-color: #66f329;
+
+}
+
+
+/* DIFICULTAD */
+
+.historial__tabla td:last-child {
+
+    font-size: 20px;
+
+    letter-spacing: 2px;
+
+}

@@ -1,0 +1,86 @@
+/* ==============================
+   RESPONSIVE - TABLET
+   ============================== */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    /* ==============================
+       HEADER
+       ============================== */
+
+    .header {
+        padding: 20px 5%;
+    }
+
+    .header__logo {
+        width: 90px;
+    }
+
+    .header__titulo {
+        font-size: 26px;
+    }
+
+    .header__boton {
+        padding: 10px 16px;
+    }
+
+
+    /* ==============================
+       MAIN
+       ============================== */
+
+    .main {
+        padding: 20px 5%;
+    }
+
+    .main__lista {
+        justify-content: space-between;
+    }
+
+    .main__item {
+        padding: 15px 10px;
+    }
+
+
+    /* ==============================
+       CUERPO
+       ============================== */
+
+    .cuerpo {
+        padding: 20px 5%;
+    }
+
+    .cuerpo__boton {
+        padding: 14px 20px;
+    }
+
+
+    /* ==============================
+       RESUMEN
+       ============================== */
+
+    .resumen {
+        padding: 35px 5%;
+    }
+
+    .resumen__lista {
+        max-width: 700px;
+    }
+
+    .resumen__titulo {
+        font-size: 26px;
+    }
+
+
+    /* ==============================
+       FOOTER
+       ============================== */
+
+    .footer {
+        padding: 40px 5%;
+    }
+
+    .footer__derechos {
+        font-size: 14px;
+    }
+}

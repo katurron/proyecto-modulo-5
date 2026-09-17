@@ -1,0 +1,46 @@
+
+.footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 40px 8%;
+    background-color: #30c573;
+    color: #333;
+}
+
+.footer__contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer__titulo {
+    margin: 0 0 10px;
+}
+
+.footer__texto {
+    margin: 0;
+}
+
+.footer__derechos {
+    align-self: end;
+    justify-self: end;
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.6;
+}
+@media (max-width: 768px) {
+
+    .footer {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        padding: 30px 5%;
+        align-items: center;
+    }
+
+    .footer__derechos {
+        justify-self: start;
+        align-self: auto;
+        font-size: 13px;
+    }
+}

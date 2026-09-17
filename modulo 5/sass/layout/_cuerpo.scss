@@ -1,0 +1,50 @@
+
+.cuerpo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #30c573;
+    padding: 20px 8%;
+    width: 100%;
+}
+
+.cuerpo__acordeon {
+    width: 100%;
+}
+
+.cuerpo__item {
+    background-color: transparent;
+    border: none;
+}
+
+
+
+.cuerpo__contenido {
+    background-color: #ffffff;
+}
+
+.cuerpo__tareas {
+    padding: 20px;
+}
+@media (max-width: 768px) {
+
+    .cuerpo {
+        padding: 15px 5%;
+    }
+
+    .cuerpo__boton {
+        padding: 12px 15px;
+    }
+
+    .cuerpo__tareas {
+        padding: 15px;
+    }
+}
+.cuerpo__tarea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 5px;
+    background-color: #ffffff;
+}
