@@ -1,1065 +1,452 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
+    const CLAVES = {
+        historial: "historialTareas",
+        pendientes: "tareasPendientes"
+    };
+    const crearId = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
 
-    // ==========================================
-    // DATOS GUARDADOS
-    // ==========================================
+    const leerLista = (clave) => {
+        try {
+            const datos = JSON.parse(localStorage.getItem(clave));
+            return Array.isArray(datos) ? datos : [];
+        } catch {
+            return [];
+        }
+    };
 
-    let historialTareas = JSON.parse(
-        localStorage.getItem("historialTareas")
-    ) || [];
+    class Tarea {
+        constructor({ id = crearId(), ...datos }) {
+            this.id = id;
+            Object.assign(this, datos);
+        }
 
-    let tareasPendientes = JSON.parse(
-        localStorage.getItem("tareasPendientes")
-    ) || [];
+        editar(cambios) {
+            Object.assign(this, cambios);
+        }
 
+        calificar(dificultad) {
+            this.dificultad = dificultad;
+        }
 
-    // ==========================================
-    // ELEMENTOS DEL HEADER
-    // ==========================================
-
-    const btnAgregar = document.querySelector("#btnAgregar");
-    const btnCancelar = document.querySelector("#btnCancelar");
-
-
-    // ==========================================
-    // ELEMENTOS DEL FORMULARIO
-    // ==========================================
-
-    const formulario = document.querySelector("#formulario");
-    const formularioContenido =
-        document.querySelector(".formulario__contenido");
-
-    const nombreTarea =
-        document.querySelector("#nombreTarea");
-
-    const categoriaTarea =
-        document.querySelector("#categoriaTarea");
-
-    const fechaTarea =
-        document.querySelector("#fechaTarea");
-
-
-    // ==========================================
-    // ELEMENTOS DEL ACORDEÓN
-    // ==========================================
-
-    const tareasImportantes =
-        document.querySelector(
-            "#flush-collapseOne .cuerpo__tareas"
-        );
-
-    const tareasRegulares =
-        document.querySelector(
-            "#flush-collapseTwo .cuerpo__tareas"
-        );
-
-    const tareasComplementarias =
-        document.querySelector(
-            "#flush-collapseThree .cuerpo__tareas"
-        );
-
-
-    // ==========================================
-    // ABRIR FORMULARIO
-    // ==========================================
-
-    if (btnAgregar) {
-
-        btnAgregar.addEventListener("click", function () {
-
-            formulario.classList.add(
-                "formulario--visible"
-            );
-
-        });
-
+        completar({ fechaFinalizacion, horaFinalizacion }) {
+            this.fechaFinalizacion = fechaFinalizacion;
+            this.horaFinalizacion = horaFinalizacion;
+            this.estado = "completada";
+        }
     }
 
+    class GestorTareas {
+        constructor(pendientes, historial) {
+            this.pendientes = pendientes.map((tarea) => new Tarea(tarea));
+            this.historial = historial.map((tarea) => new Tarea(tarea));
+        }
 
-    // ==========================================
-    // CANCELAR
-    // ==========================================
+        guardarPendientes() {
+            localStorage.setItem(CLAVES.pendientes, JSON.stringify(this.pendientes));
+        }
 
-    if (btnCancelar) {
+        guardarHistorial() {
+            localStorage.setItem(CLAVES.historial, JSON.stringify(this.historial));
+        }
 
-        btnCancelar.addEventListener("click", function () {
+        agregar(datos) {
+            this.pendientes = [...this.pendientes, new Tarea(datos)];
+            this.guardarPendientes();
+        }
 
-            formulario.classList.remove(
-                "formulario--visible"
-            );
+        editar(id, cambios) {
+            this.pendientes.find((tarea) => tarea.id === id)?.editar(cambios);
+            this.guardarPendientes();
+        }
 
-            formularioContenido.reset();
+        eliminar(id) {
+            this.pendientes = this.pendientes.filter((tarea) => tarea.id !== id);
+            this.guardarPendientes();
+        }
 
-        });
+        calificar(id, dificultad) {
+            this.pendientes.find((tarea) => tarea.id === id)?.calificar(dificultad);
+            this.guardarPendientes();
+        }
 
+        completar(id, fechas) {
+            const tarea = this.pendientes.find((pendiente) => pendiente.id === id);
+            if (!tarea) return false;
+            tarea.completar(fechas);
+            this.historial = [...this.historial, tarea];
+            this.pendientes = this.pendientes.filter((pendiente) => pendiente.id !== id);
+            this.guardarPendientes();
+            this.guardarHistorial();
+            return true;
+        }
     }
 
+    const gestor = new GestorTareas(
+        leerLista(CLAVES.pendientes),
+        leerLista(CLAVES.historial)
+    );
+    let historialTareas = gestor.historial;
+    let tareasPendientes = gestor.pendientes;
+    let idEnEdicion = null;
 
-    // ==========================================
-    // MOSTRAR TAREAS EN EL ACORDEÓN
-    // ==========================================
+    const $ = (selector) => document.querySelector(selector);
+    const elementos = {
+        btnAgregar: $("#btnAgregar"),
+        btnCancelar: $("#btnCancelar"),
+        formulario: $("#formulario"),
+        formularioContenido: $(".formulario__contenido"),
+        nombreTarea: $("#nombreTarea"),
+        categoriaTarea: $("#categoriaTarea"),
+        fechaTarea: $("#fechaTarea"),
+        tareasImportantes: $("#flush-collapseOne .cuerpo__tareas"),
+        tareasRegulares: $("#flush-collapseTwo .cuerpo__tareas"),
+        tareasComplementarias: $("#flush-collapseThree .cuerpo__tareas"),
+        modalHoy: $("#modalHoy"),
+        modalHoyContenido: $("#modalHoyContenido"),
+        btnPendientes: $("#btnPendientes"),
+        btnCompletadas: $("#btnCompletadas"),
+        resumen: $("#resumen")
+    };
 
-    function mostrarTareas() {
+    const ahoraFormateado = () => {
+        const ahora = new Date();
+        const fecha = [
+            ahora.getFullYear(),
+            String(ahora.getMonth() + 1).padStart(2, "0"),
+            String(ahora.getDate()).padStart(2, "0")
+        ].join("-");
+        const hora = ahora.toTimeString().slice(0, 5);
+        return { fecha, hora };
+    };
 
-        // Limpiar las tres categorías
+    const guardarPendientes = () => {
+        gestor.pendientes = tareasPendientes;
+        gestor.guardarPendientes();
+    };
 
-        tareasImportantes.innerHTML = "";
-        tareasRegulares.innerHTML = "";
-        tareasComplementarias.innerHTML = "";
+    const guardarHistorial = () => {
+        gestor.historial = historialTareas;
+        gestor.guardarHistorial();
+    };
 
+    // Incluye rest al recibir propiedades y spread al crear una copia independiente.
+    const crearTarea = ({ id = crearId(), ...datos }) => new Tarea({ id, ...datos });
 
-        // Recorrer tareas guardadas
-
-        tareasPendientes.forEach(function (tarea) {
-
-            const elemento =
-                document.createElement("div");
-
-            elemento.classList.add(
-                "cuerpo__tarea"
-            );
-
-
-            // Guardar información en dataset
-
-            elemento.dataset.nombre =
-                tarea.nombre;
-
-            elemento.dataset.fecha =
-                tarea.fecha;
-
-            elemento.dataset.categoria =
-                tarea.categoria;
-
-            elemento.dataset.fechaCreacion =
-                tarea.fechaCreacion;
-
-            elemento.dataset.horaCreacion =
-                tarea.horaCreacion;
-
-            elemento.dataset.estado =
-                "pendiente";
-
-
-            // Mostrar información
-
-            elemento.innerHTML = `
-                <strong>
-                    ${tarea.nombre}
-                </strong>
-
-                <span>
-                    Fecha: ${tarea.fecha}
-                </span>
-            `;
-
-
-            // ==================================
-            // UBICAR POR CATEGORÍA
-            // ==================================
-
-            if (
-                tarea.categoria ===
-                "importantes"
-            ) {
-
-                tareasImportantes.appendChild(
-                    elemento
-                );
-
-            }
-
-            else if (
-                tarea.categoria ===
-                "regulares"
-            ) {
-
-                tareasRegulares.appendChild(
-                    elemento
-                );
-
-            }
-
-            else if (
-                tarea.categoria ===
-                "complementarias"
-            ) {
-
-                tareasComplementarias.appendChild(
-                    elemento
-                );
-
-            }
-
+    // Asigna identificadores a tareas creadas antes de esta versión.
+    const migrarTareasSinId = () => {
+        let huboCambios = false;
+        tareasPendientes = tareasPendientes.map((tarea) => {
+            if (tarea.id) return tarea;
+            huboCambios = true;
+            return crearTarea(tarea);
         });
 
-    }
+        if (huboCambios) guardarPendientes();
+    };
 
+    const obtenerContenedor = (categoria) => ({
+        importantes: elementos.tareasImportantes,
+        regulares: elementos.tareasRegulares,
+        complementarias: elementos.tareasComplementarias
+    }[categoria]);
 
-    // ==========================================
-    // MOSTRAR TAREAS AL CARGAR LA PÁGINA
-    // ==========================================
+    const crearBoton = (texto, accion, id, clase) => {
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.textContent = texto;
+        boton.dataset.accion = accion;
+        boton.dataset.id = id;
+        boton.className = clase;
+        return boton;
+    };
 
+    const crearElementoTarea = (tarea) => {
+        const elemento = document.createElement("div");
+        elemento.className = "cuerpo__tarea";
+        elemento.dataset.id = tarea.id;
+
+        const titulo = document.createElement("strong");
+        titulo.textContent = tarea.nombre;
+
+        const fecha = document.createElement("span");
+        fecha.textContent = `Fecha: ${tarea.fecha}`;
+
+        const contador = document.createElement("span");
+        contador.className = "contadorTarea";
+        contador.dataset.fecha = tarea.fecha;
+
+        const acciones = document.createElement("div");
+        acciones.className = "cuerpo__acciones";
+        acciones.append(
+            crearBoton("Editar", "editar", tarea.id, "btnEditar"),
+            crearBoton("Eliminar", "eliminar", tarea.id, "btnEliminar")
+        );
+
+        elemento.append(titulo, fecha, contador, acciones);
+        return elemento;
+    };
+
+    const actualizarContadores = () => {
+        document.querySelectorAll(".contadorTarea").forEach((contador) => {
+            const limite = new Date(`${contador.dataset.fecha}T23:59:59`);
+            const diferencia = limite - new Date();
+            if (Number.isNaN(limite.getTime()) || diferencia < 0) {
+                contador.textContent = "Fecha límite vencida";
+                contador.classList.add("contadorTarea--vencido");
+                return;
+            }
+
+            const minutos = Math.floor(diferencia / 60000);
+            const dias = Math.floor(minutos / 1440);
+            const horas = Math.floor((minutos % 1440) / 60);
+            const minutosRestantes = minutos % 60;
+            contador.textContent = `Faltan ${dias} d, ${horas} h y ${minutosRestantes} min`;
+            contador.classList.remove("contadorTarea--vencido");
+        });
+    };
+
+    const mostrarTareas = () => {
+        [
+            elementos.tareasImportantes,
+            elementos.tareasRegulares,
+            elementos.tareasComplementarias
+        ].filter(Boolean).forEach((contenedor) => {
+            contenedor.replaceChildren();
+        });
+
+        tareasPendientes.forEach((tarea) => {
+            const contenedor = obtenerContenedor(tarea.categoria);
+            if (contenedor) contenedor.appendChild(crearElementoTarea(tarea));
+        });
+        actualizarContadores();
+    };
+
+    const actualizarResumen = () => {
+        if (!elementos.resumen) return;
+
+        const { fecha: hoy } = ahoraFormateado();
+        const pendientesHoy = tareasPendientes.filter(({ fecha }) => fecha === hoy).length;
+        const completadasHoy = historialTareas.filter(
+            ({ fechaFinalizacion }) => fechaFinalizacion === hoy
+        ).length;
+        const principales = tareasPendientes.filter(
+            ({ categoria }) => categoria === "importantes"
+        ).length;
+
+        const badges = elementos.resumen.querySelectorAll("li .badge");
+        [completadasHoy, pendientesHoy, principales].forEach((cantidad, indice) => {
+            if (badges[indice]) badges[indice].textContent = cantidad;
+        });
+    };
+
+    const limpiarFormulario = () => {
+        elementos.formularioContenido?.reset();
+        idEnEdicion = null;
+        if (elementos.btnAgregar) elementos.btnAgregar.textContent = "Agregar tarea";
+    };
+
+    const cerrarFormulario = () => {
+        elementos.formulario?.classList.remove("formulario--visible");
+        limpiarFormulario();
+    };
+
+    const editarTarea = (id) => {
+        const tarea = tareasPendientes.find((pendiente) => pendiente.id === id);
+        if (!tarea || !elementos.formulario) return;
+
+        const { nombre, categoria, fecha } = tarea;
+        elementos.nombreTarea.value = nombre;
+        elementos.categoriaTarea.value = categoria;
+        elementos.fechaTarea.value = fecha;
+        idEnEdicion = id;
+        elementos.formulario.classList.add("formulario--visible");
+        elementos.nombreTarea.focus();
+    };
+
+    const eliminarTarea = (id) => {
+        const tarea = tareasPendientes.find((pendiente) => pendiente.id === id);
+        if (!tarea) return;
+
+        if (!window.confirm(`¿Eliminar la tarea “${tarea.nombre}”?`)) return;
+
+        gestor.eliminar(id);
+        tareasPendientes = gestor.pendientes;
+        mostrarTareas();
+        actualizarResumen();
+    };
+
+    const mostrarTareasHoy = () => {
+        if (!elementos.modalHoyContenido) return;
+
+        const { fecha: hoy } = ahoraFormateado();
+        const tareasHoy = tareasPendientes.filter(({ fecha }) => fecha === hoy);
+        elementos.modalHoyContenido.replaceChildren();
+
+        if (!tareasHoy.length) {
+            elementos.modalHoyContenido.textContent = "🎉 ¡Felicitaciones! No tienes tareas programadas para hoy.";
+            return;
+        }
+
+        tareasHoy.forEach((tarea) => {
+            const tarjeta = document.createElement("div");
+            tarjeta.className = "modal__tarea";
+            tarjeta.dataset.id = tarea.id;
+
+            const titulo = document.createElement("strong");
+            titulo.textContent = `📌 ${tarea.nombre}`;
+            const detalle = document.createElement("span");
+            detalle.textContent = `Categoría: ${tarea.categoria} | Fecha: ${tarea.fecha}`;
+
+            const estrellas = document.createElement("div");
+            estrellas.className = "modal__estrellas";
+            estrellas.append("Dificultad: ");
+
+            for (let valor = 1; valor <= 5; valor += 1) {
+                const estrella = document.createElement("button");
+                estrella.type = "button";
+                estrella.dataset.dificultad = valor;
+                estrella.textContent = valor <= (tarea.dificultad || 0) ? "★" : "☆";
+                estrellas.appendChild(estrella);
+            }
+
+            const completar = crearBoton("✓ Completar", "completar", tarea.id, "modal__boton-completar");
+            completar.disabled = !tarea.dificultad;
+            tarjeta.append(titulo, detalle, estrellas, completar);
+            elementos.modalHoyContenido.appendChild(tarjeta);
+        });
+    };
+
+    const mostrarNotificacion = (mensaje, tipo = "informacion") => {
+        let aviso = $("#notificacionTareas");
+        if (!aviso) {
+            aviso = document.createElement("div");
+            aviso.id = "notificacionTareas";
+            aviso.setAttribute("role", "status");
+            document.body.appendChild(aviso);
+        }
+        aviso.className = `notificacionTareas notificacionTareas--${tipo}`;
+        aviso.textContent = mensaje;
+        aviso.hidden = false;
+        return aviso;
+    };
+
+    const agregarTareaConRetardo = (datos) => {
+        const aviso = mostrarNotificacion("Guardando tarea...");
+        const botonEnviar = elementos.formularioContenido?.querySelector('[type="submit"]');
+        if (botonEnviar) botonEnviar.disabled = true;
+        setTimeout(() => {
+            gestor.agregar(datos);
+            tareasPendientes = gestor.pendientes;
+            mostrarTareas();
+            actualizarResumen();
+            cerrarFormulario();
+            if (botonEnviar) botonEnviar.disabled = false;
+
+            setTimeout(() => {
+                mostrarNotificacion("✓ Tarea creada correctamente.", "exito");
+                setTimeout(() => { aviso.hidden = true; }, 3000);
+            }, 2000);
+        }, 800);
+    };
+
+    elementos.btnAgregar?.addEventListener("click", () => {
+        elementos.formulario?.classList.add("formulario--visible");
+        elementos.nombreTarea?.focus();
+    });
+
+    elementos.btnCancelar?.addEventListener("click", cerrarFormulario);
+
+    // keyup: feedback inmediato sobre el campo obligatorio del formulario.
+    elementos.nombreTarea?.addEventListener("keyup", ({ currentTarget }) => {
+        const esValido = currentTarget.value.trim().length >= 3;
+        currentTarget.setCustomValidity(esValido ? "" : "Escribe al menos 3 caracteres.");
+        currentTarget.setAttribute("aria-invalid", String(!esValido));
+    });
+
+    elementos.formularioContenido?.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+
+        const nombre = elementos.nombreTarea.value.trim();
+        const categoria = elementos.categoriaTarea.value;
+        const fecha = elementos.fechaTarea.value;
+        if (nombre.length < 3 || !categoria || !fecha) {
+            alert("Completa todos los campos y escribe un nombre de al menos 3 caracteres.");
+            return;
+        }
+
+        if (idEnEdicion) {
+            gestor.editar(idEnEdicion, { nombre, categoria, fecha });
+            tareasPendientes = gestor.pendientes;
+            mostrarTareas();
+            actualizarResumen();
+            cerrarFormulario();
+        } else {
+            const { fecha: fechaCreacion, hora: horaCreacion } = ahoraFormateado();
+            agregarTareaConRetardo({
+                nombre, categoria, fecha, fechaCreacion, horaCreacion,
+                estado: "pendiente", dificultad: null
+            });
+        }
+    });
+
+    // Delegación: funciona para los botones creados dinámicamente.
+    document.addEventListener("click", (evento) => {
+        const boton = evento.target.closest("[data-accion]");
+        if (!boton) return;
+        const { accion, id } = boton.dataset;
+        if (accion === "editar") editarTarea(id);
+        if (accion === "eliminar") eliminarTarea(id);
+    });
+
+    // mouseover: explica la acción destructiva antes de hacer clic.
+    document.addEventListener("mouseover", (evento) => {
+        const boton = evento.target.closest(".btnEliminar");
+        if (boton) boton.title = "Eliminar esta tarea pendiente";
+    });
+
+    elementos.modalHoy?.addEventListener("show.bs.modal", mostrarTareasHoy);
+
+    elementos.modalHoyContenido?.addEventListener("click", (evento) => {
+        const estrella = evento.target.closest("[data-dificultad]");
+        if (estrella) {
+            const tarjeta = estrella.closest(".modal__tarea");
+            const dificultad = Number(estrella.dataset.dificultad);
+            gestor.calificar(tarjeta.dataset.id, dificultad);
+            tareasPendientes = gestor.pendientes;
+            mostrarTareasHoy();
+            return;
+        }
+
+        const boton = evento.target.closest('[data-accion="completar"]');
+        if (!boton) return;
+        const tarea = tareasPendientes.find((pendiente) => pendiente.id === boton.dataset.id);
+        if (!tarea) return;
+        if (!tarea.dificultad) {
+            alert("Debes evaluar la dificultad antes de completar la tarea.");
+            return;
+        }
+
+        const { fecha: fechaFinalizacion, hora: horaFinalizacion } = ahoraFormateado();
+        gestor.completar(tarea.id, { fechaFinalizacion, horaFinalizacion });
+        historialTareas = gestor.historial;
+        tareasPendientes = gestor.pendientes;
+        mostrarTareas();
+        actualizarResumen();
+        mostrarTareasHoy();
+    });
+
+    elementos.btnPendientes?.addEventListener("click", () => {
+        ["#flush-collapseOne", "#flush-collapseTwo", "#flush-collapseThree"].forEach((selector) => {
+            $(selector)?.classList.add("show");
+        });
+    });
+
+    elementos.btnCompletadas?.addEventListener("click", () => {
+        window.location.href = "./completadas.html";
+    });
+
+    migrarTareasSinId();
     mostrarTareas();
-
-
-    // ==========================================
-    // GUARDAR NUEVA TAREA
-    // ==========================================
-
-    if (formularioContenido) {
-
-        formularioContenido.addEventListener(
-            "submit",
-            function (evento) {
-
-                evento.preventDefault();
-
-
-                // ==================================
-                // OBTENER DATOS
-                // ==================================
-
-                const nombre =
-                    nombreTarea.value.trim();
-
-                const categoria =
-                    categoriaTarea.value;
-
-                const fecha =
-                    fechaTarea.value;
-
-
-                // ==================================
-                // VALIDAR
-                // ==================================
-
-                if (
-                    nombre === "" ||
-                    categoria === "" ||
-                    fecha === ""
-                ) {
-
-                    alert(
-                        "Por favor, completa todos los campos."
-                    );
-
-                    return;
-
-                }
-
-
-                // ==================================
-                // FECHA Y HORA DE CREACIÓN
-                // ==================================
-
-                const ahora = new Date();
-
-
-                const fechaCreacion =
-                    ahora.getFullYear() +
-                    "-" +
-                    String(
-                        ahora.getMonth() + 1
-                    ).padStart(2, "0") +
-                    "-" +
-                    String(
-                        ahora.getDate()
-                    ).padStart(2, "0");
-
-
-                const horaCreacion =
-                    String(
-                        ahora.getHours()
-                    ).padStart(2, "0") +
-                    ":" +
-                    String(
-                        ahora.getMinutes()
-                    ).padStart(2, "0");
-
-
-                // ==================================
-                // CREAR OBJETO
-                // ==================================
-
-                const nuevaTarea = {
-
-                    nombre: nombre,
-
-                    categoria: categoria,
-
-                    fecha: fecha,
-
-                    fechaCreacion:
-                        fechaCreacion,
-
-                    horaCreacion:
-                        horaCreacion,
-
-                    estado: "pendiente"
-
-                };
-
-
-                // ==================================
-                // GUARDAR
-                // ==================================
-
-                tareasPendientes.push(
-                    nuevaTarea
-                );
-
-
-                localStorage.setItem(
-                    "tareasPendientes",
-                    JSON.stringify(
-                        tareasPendientes
-                    )
-                );
-
-
-                // ==================================
-                // ACTUALIZAR PANTALLA
-                // ==================================
-
-                mostrarTareas();
-
-                actualizarResumen();
-
-
-                // ==================================
-                // LIMPIAR Y CERRAR
-                // ==================================
-
-                formularioContenido.reset();
-
-                formulario.classList.remove(
-                    "formulario--visible"
-                );
-
-
-                console.log(
-                    "Tarea guardada:",
-                    nuevaTarea
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================================
-    // TAREAS PROGRAMADAS HOY
-    // ==========================================
-
-    const modalHoy =
-        document.querySelector("#modalHoy");
-
-    const modalHoyContenido =
-        document.querySelector(
-            "#modalHoyContenido"
-        );
-
-
-    if (modalHoy) {
-
-        modalHoy.addEventListener(
-            "show.bs.modal",
-            function () {
-
-                mostrarTareasHoy();
-
-            }
-        );
-
-    }
-
-
-    // ==========================================
-    // MOSTRAR TAREAS DE HOY
-    // ==========================================
-
-    function mostrarTareasHoy() {
-
-        const ahora = new Date();
-
-
-        const hoy =
-            ahora.getFullYear() +
-            "-" +
-            String(
-                ahora.getMonth() + 1
-            ).padStart(2, "0") +
-            "-" +
-            String(
-                ahora.getDate()
-            ).padStart(2, "0");
-
-
-        modalHoyContenido.innerHTML = "";
-
-
-        const tareasHoy =
-            tareasPendientes.filter(
-                function (tarea) {
-
-                    return tarea.fecha === hoy;
-
-                }
-            );
-
-
-        // ==================================
-        // SIN TAREAS
-        // ==================================
-
-        if (tareasHoy.length === 0) {
-
-            modalHoyContenido.innerHTML = `
-
-                <p>
-                    🎉 ¡Felicitaciones!
-                </p>
-
-                <p>
-                    No tienes tareas programadas
-                    para hoy.
-                </p>
-
-            `;
-
-            return;
-
-        }
-
-
-        // ==================================
-        // CREAR TAREAS
-        // ==================================
-
-        tareasHoy.forEach(function (tarea) {
-
-            const tareaModal =
-                document.createElement("div");
-
-            tareaModal.classList.add(
-                "modal__tarea"
-            );
-
-
-            tareaModal.innerHTML = `
-
-                <strong>
-                    📌 ${tarea.nombre}
-                </strong>
-
-                <span>
-                    Categoría:
-                    ${tarea.categoria}
-                </span>
-
-                <span>
-                    Fecha:
-                    ${tarea.fecha}
-                </span>
-
-                <div class="modal__estrellas">
-
-                    <span>
-                        Dificultad:
-                    </span>
-
-                    <button
-                        type="button"
-                        data-dificultad="1">
-                        ☆
-                    </button>
-
-                    <button
-                        type="button"
-                        data-dificultad="2">
-                        ☆
-                    </button>
-
-                    <button
-                        type="button"
-                        data-dificultad="3">
-                        ☆
-                    </button>
-
-                    <button
-                        type="button"
-                        data-dificultad="4">
-                        ☆
-                    </button>
-
-                    <button
-                        type="button"
-                        data-dificultad="5">
-                        ☆
-                    </button>
-
-                </div>
-
-                <button
-                    type="button"
-                    class="modal__boton-completar"
-                    disabled>
-                    ✓ Completar
-                </button>
-
-            `;
-
-
-            modalHoyContenido.appendChild(
-                tareaModal
-            );
-
-
-            // ==================================
-            // ESTRELLAS
-            // ==================================
-
-            const estrellas =
-                tareaModal.querySelectorAll(
-                    ".modal__estrellas button"
-                );
-
-
-            const botonCompletar =
-                tareaModal.querySelector(
-                    ".modal__boton-completar"
-                );
-
-
-            estrellas.forEach(
-                function (estrella) {
-
-                    estrella.addEventListener(
-                        "click",
-                        function () {
-
-                            const dificultad =
-                                Number(
-                                    estrella.dataset
-                                        .dificultad
-                                );
-
-
-                            estrellas.forEach(
-                                function (
-                                    estrellaActual
-                                ) {
-
-                                    const valor =
-                                        Number(
-                                            estrellaActual
-                                                .dataset
-                                                .dificultad
-                                        );
-
-
-                                    if (
-                                        valor <=
-                                        dificultad
-                                    ) {
-
-                                        estrellaActual
-                                            .textContent =
-                                            "★";
-
-                                    } else {
-
-                                        estrellaActual
-                                            .textContent =
-                                            "☆";
-
-                                    }
-
-                                }
-                            );
-
-
-                            // Guardar dificultad
-                            tarea.dificultad =
-                                dificultad;
-
-
-                            // Activar completar
-                            botonCompletar.disabled =
-                                false;
-
-                        }
-                    );
-
-                }
-            );
-
-        });
-
-    }
-
-
-    // ==========================================
-    // COMPLETAR TAREA
-    // ==========================================
-
-    if (modalHoyContenido) {
-
-        modalHoyContenido.addEventListener(
-            "click",
-            function (evento) {
-
-                if (
-                    !evento.target.classList.contains(
-                        "modal__boton-completar"
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                const tareaModal =
-                    evento.target.closest(
-                        ".modal__tarea"
-                    );
-
-
-                const nombre =
-                    tareaModal
-                        .querySelector("strong")
-                        .textContent
-                        .replace("📌 ", "")
-                        .trim();
-
-
-                // ==================================
-                // BUSCAR EN PENDIENTES
-                // ==================================
-
-                const posicion =
-                    tareasPendientes.findIndex(
-                        function (tarea) {
-
-                            return (
-                                tarea.nombre ===
-                                nombre
-                            );
-
-                        }
-                    );
-
-
-                if (posicion === -1) {
-
-                    alert(
-                        "No se encontró la tarea."
-                    );
-
-                    return;
-
-                }
-
-
-                const tarea =
-                    tareasPendientes[posicion];
-
-
-                // ==================================
-                // VERIFICAR DIFICULTAD
-                // ==================================
-
-                if (
-                    !tarea.dificultad ||
-                    tarea.dificultad < 1 ||
-                    tarea.dificultad > 5
-                ) {
-
-                    alert(
-                        "Debes evaluar la dificultad antes de completar la tarea."
-                    );
-
-                    return;
-
-                }
-
-
-                // ==================================
-                // FECHA Y HORA FINALIZACIÓN
-                // ==================================
-
-                const ahora = new Date();
-
-
-                const fechaFinalizacion =
-                    ahora.getFullYear() +
-                    "-" +
-                    String(
-                        ahora.getMonth() + 1
-                    ).padStart(2, "0") +
-                    "-" +
-                    String(
-                        ahora.getDate()
-                    ).padStart(2, "0");
-
-
-                const horaFinalizacion =
-                    String(
-                        ahora.getHours()
-                    ).padStart(2, "0") +
-                    ":" +
-                    String(
-                        ahora.getMinutes()
-                    ).padStart(2, "0");
-
-
-                // ==================================
-                // CREAR HISTORIAL
-                // ==================================
-
-                const tareaCompletada = {
-
-                    nombre:
-                        tarea.nombre,
-
-                    categoria:
-                        tarea.categoria,
-
-                    fecha:
-                        tarea.fecha,
-
-                    fechaCreacion:
-                        tarea.fechaCreacion,
-
-                    horaCreacion:
-                        tarea.horaCreacion,
-
-                    fechaFinalizacion:
-                        fechaFinalizacion,
-
-                    horaFinalizacion:
-                        horaFinalizacion,
-
-                    dificultad:
-                        tarea.dificultad,
-
-                    estado:
-                        "completada"
-
-                };
-
-
-                // ==================================
-                // AGREGAR AL HISTORIAL
-                // ==================================
-
-                historialTareas.push(
-                    tareaCompletada
-                );
-
-
-                localStorage.setItem(
-                    "historialTareas",
-                    JSON.stringify(
-                        historialTareas
-                    )
-                );
-
-
-                // ==================================
-                // ELIMINAR DE PENDIENTES
-                // ==================================
-
-                tareasPendientes.splice(
-                    posicion,
-                    1
-                );
-
-
-                localStorage.setItem(
-                    "tareasPendientes",
-                    JSON.stringify(
-                        tareasPendientes
-                    )
-                );
-
-
-                // ==================================
-                // ACTUALIZAR PANTALLA
-                // ==================================
-
-                mostrarTareas();
-
-                actualizarResumen();
-
-
-                // ==================================
-                // ELIMINAR DE MODAL
-                // ==================================
-
-                tareaModal.remove();
-
-
-                console.log(
-                    "Tarea completada:",
-                    tareaCompletada
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================================
-    // TAREAS PENDIENTES
-    // ==========================================
-
-    const btnPendientes =
-        document.querySelector(
-            "#btnPendientes"
-        );
-
-
-    const importantes =
-        document.querySelector(
-            "#flush-collapseOne"
-        );
-
-    const regulares =
-        document.querySelector(
-            "#flush-collapseTwo"
-        );
-
-    const complementarias =
-        document.querySelector(
-            "#flush-collapseThree"
-        );
-
-
-    if (btnPendientes) {
-
-        btnPendientes.addEventListener(
-            "click",
-            function () {
-
-                importantes.classList.add(
-                    "show"
-                );
-
-                regulares.classList.add(
-                    "show"
-                );
-
-                complementarias.classList.add(
-                    "show"
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==========================================
-    // TAREAS COMPLETADAS
-    // ==========================================
-
-    const btnCompletadas =
-        document.querySelector(
-            "#btnCompletadas"
-        );
-
-
-    if (btnCompletadas) {
-
-        btnCompletadas.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "./completadas.html";
-
-            }
-        );
-
-    }
-
-
-    // ==========================================
-    // RESUMEN
-    // ==========================================
-
-    function actualizarResumen() {
-
-        const ahora = new Date();
-
-
-        const hoy =
-            ahora.getFullYear() +
-            "-" +
-            String(
-                ahora.getMonth() + 1
-            ).padStart(2, "0") +
-            "-" +
-            String(
-                ahora.getDate()
-            ).padStart(2, "0");
-
-
-        // ==================================
-        // PENDIENTES DE HOY
-        // ==================================
-
-        const pendientesHoy =
-            tareasPendientes.filter(
-                function (tarea) {
-
-                    return tarea.fecha === hoy;
-
-                }
-            ).length;
-
-
-        // ==================================
-        // COMPLETADAS HOY
-        // ==================================
-
-        const completadasHoy =
-            historialTareas.filter(
-                function (tarea) {
-
-                    return (
-                        tarea.fechaFinalizacion ===
-                        hoy
-                    );
-
-                }
-            ).length;
-
-
-        // ==================================
-        // PRINCIPALES
-        // ==================================
-
-        const principales =
-            tareasPendientes.filter(
-                function (tarea) {
-
-                    return (
-                        tarea.categoria ===
-                        "importantes"
-                    );
-
-                }
-            ).length;
-
-
-        // ==================================
-        // BUSCAR ELEMENTOS DEL RESUMEN
-        // ==================================
-
-        const resumen =
-            document.querySelector(
-                "#resumen"
-            );
-
-
-        if (!resumen) {
-
-            return;
-
-        }
-
-
-        const elementos =
-            resumen.querySelectorAll(
-                "li"
-            );
-
-
-        // Completadas hoy
-
-        if (elementos[0]) {
-
-            const badge =
-                elementos[0].querySelector(
-                    ".badge"
-                );
-
-            if (badge) {
-
-                badge.textContent =
-                    completadasHoy;
-
-            }
-
-        }
-
-
-        // Pendientes hoy
-
-        if (elementos[1]) {
-
-            const badge =
-                elementos[1].querySelector(
-                    ".badge"
-                );
-
-            if (badge) {
-
-                badge.textContent =
-                    pendientesHoy;
-
-            }
-
-        }
-
-
-        // Principales
-
-        if (elementos[2]) {
-
-            const badge =
-                elementos[2].querySelector(
-                    ".badge"
-                );
-
-            if (badge) {
-
-                badge.textContent =
-                    principales;
-
-            }
-
-        }
-
-
-        console.log(
-            "Completadas hoy:",
-            completadasHoy
-        );
-
-        console.log(
-            "Pendientes hoy:",
-            pendientesHoy
-        );
-
-        console.log(
-            "Principales:",
-            principales
-        );
-
-    }
-
-
-    // ==========================================
-    // CARGAR RESUMEN
-    // ==========================================
-
     actualizarResumen();
-
+    setInterval(actualizarContadores, 60000);
 });
