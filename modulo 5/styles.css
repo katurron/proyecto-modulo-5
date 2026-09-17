@@ -190,6 +190,45 @@ body {
 .cuerpo__tareas {
   padding: 20px;
 }
+.cuerpo__acciones {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.contadorTarea {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #245c8a;
+    color: #30c573;
+}
+
+.contadorTarea--vencido {
+    color: #b42318;
+    color: #500202;
+    font-weight: 700;
+}
+
+.notificacionTareas {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 2000;
+    padding: 0.9rem 1.1rem;
+    border-radius: 0.5rem;
+    color: #fff;
+    background: #245c8a;
+    color: #ffffff;
+    background: #30c573;
+    box-shadow: 0 0.5rem 1.25rem rgb(0 0 0 / 18%);
+}
+
+.notificacionTareas--exito {
+    color: #333;
+    background: #198754;
+    background: #6ef132;
+}
 
 @media (max-width: 768px) {
   .cuerpo {
@@ -357,7 +396,7 @@ body {
 /*# sourceMappingURL=styles.css.map */
 
 /* ==========================================
-   TABLA HISTORIAL - ESTILO TIPO EXCEL
+   TABLA HISTORIAL 
 ========================================== */
 
 .historial {
